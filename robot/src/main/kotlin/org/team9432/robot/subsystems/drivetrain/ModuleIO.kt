@@ -1,7 +1,6 @@
-package org.team9432.swerve.subsystems.drivetrain
+package org.team9432.robot.subsystems.drivetrain
 
 import edu.wpi.first.math.kinematics.SwerveModuleState
-import org.littletonrobotics.junction.AutoLog
 import org.team9432.lib.annotation.Logged
 
 interface ModuleIO {

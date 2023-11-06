@@ -1,4 +1,4 @@
-package org.team9432.swerve.subsystems.drivetrain
+package org.team9432.robot.subsystems.drivetrain
 
 import edu.wpi.first.math.MathUtil
 import edu.wpi.first.math.controller.PIDController
@@ -9,9 +9,9 @@ import edu.wpi.first.wpilibj.simulation.FlywheelSim
 import org.team9432.Robot
 import org.team9432.lib.util.RotationUtil
 import org.team9432.lib.util.SwerveUtil
-import org.team9432.swerve.DrivetrainConstants.DRIVE_WHEEL_CIRCUMFERENCE
-import org.team9432.swerve.DrivetrainConstants.MK4I_L2_DRIVE_REDUCTION
-import org.team9432.swerve.DrivetrainConstants.MK4I_L2_STEER_REDUCTION
+import org.team9432.robot.DrivetrainConstants.DRIVE_WHEEL_CIRCUMFERENCE
+import org.team9432.robot.DrivetrainConstants.MK4I_L2_DRIVE_REDUCTION
+import org.team9432.robot.DrivetrainConstants.MK4I_L2_STEER_REDUCTION
 
 class ModuleIOSim(override val position: ModuleIO.Position): ModuleIO {
     private val driveSim = FlywheelSim(DCMotor.getNEO(1), MK4I_L2_DRIVE_REDUCTION, 0.025)

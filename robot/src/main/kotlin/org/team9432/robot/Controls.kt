@@ -1,11 +1,11 @@
-package org.team9432.swerve
+package org.team9432.robot
 
 
 import org.team9432.lib.commandbased.commands.InstantCommand
 import org.team9432.lib.commandbased.input.KXboxController
 import org.team9432.lib.drivers.limelight.Limelight
 import org.team9432.lib.drivers.limelight.LimelightIONetworkTables
-import org.team9432.swerve.subsystems.drivetrain.Drivetrain
+import org.team9432.robot.subsystems.drivetrain.Drivetrain
 
 object Controls {
     private val controller = KXboxController(0)
