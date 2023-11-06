@@ -38,7 +38,7 @@ class LoggedProcessor(private val codeGenerator: CodeGenerator): SymbolProcessor
         val packageName = classDeclaration.packageName.asString()
         val className = classDeclaration.simpleName.asString()
 
-        val newClassName = "${className}AutoLogged"
+        val newClassName = "Logged${className}"
 
         val toLogBuilder = FunSpec.builder("toLog")
             .addModifiers(KModifier.OVERRIDE)

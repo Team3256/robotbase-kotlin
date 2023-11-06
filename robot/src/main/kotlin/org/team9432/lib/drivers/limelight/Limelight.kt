@@ -5,7 +5,7 @@ import org.littletonrobotics.junction.Logger
 import org.team9432.lib.commandbased.KSubsystem
 
 object Limelight: KSubsystem() {
-    private val inputs = LimelightIOInputsAutoLogged()
+    private val inputs = LoggedLimelightIOInputs()
     private val io = LimelightIONetworkTables()
 
     override fun constantPeriodic() {
