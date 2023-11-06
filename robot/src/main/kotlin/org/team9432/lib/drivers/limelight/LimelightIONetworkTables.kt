@@ -41,7 +41,8 @@ class LimelightIONetworkTables(private val tableName: String = "limelight"): Lim
     private var mapper: ObjectMapper? = null
 
     /** Print JSON Parse time to the console in milliseconds */
-    var profileJSON = true
+    private var profileJSON = false
+    val disablePrints = true
 
     val limelightNTTable: NetworkTable get() = NetworkTableInstance.getDefault().getTable(tableName)
 
@@ -172,10 +173,10 @@ class LimelightIONetworkTables(private val tableName: String = "limelight"): Lim
             if (responseCode == 200) {
                 return true
             } else {
-                System.err.println("Bad LL Request")
+                if (!disablePrints) System.err.println("Bad LL Request")
             }
         } catch (e: IOException) {
-            System.err.println(e.message)
+            if (!disablePrints) System.err.println(e.message)
         }
         return false
     }
@@ -189,16 +190,19 @@ class LimelightIONetworkTables(private val tableName: String = "limelight"): Lim
         if (mapper == null) {
             mapper = ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         }
-        try {
-            results = mapper!!.readValue(jsonDump, LimelightResults::class.java)
-        } catch (e: JsonProcessingException) {
-            System.err.println("lljson error: " + e.message)
+        val json = jsonDump
+        if (json.isNotEmpty()) {
+            try {
+                results = mapper!!.readValue(jsonDump, LimelightResults::class.java)
+            } catch (e: JsonProcessingException) {
+                if (!disablePrints) System.err.println("lljson error: " + e.message)
+            }
         }
         val end = System.nanoTime()
         val millis = (end - start) * .000001
         results.targetingResults.latencyJsonParse = millis
         if (profileJSON) {
-            println("lljson: $millis")
+            if (!disablePrints) println("lljson: $millis")
         }
         return results
     }
@@ -470,7 +474,6 @@ class LimelightIONetworkTables(private val tableName: String = "limelight"): Lim
 
 private fun toPose3D(inData: DoubleArray): Pose3d {
     if (inData.size < 6) {
-        System.err.println("Bad LL 3D Pose Data!")
         return Pose3d()
     }
     return Pose3d(
@@ -484,7 +487,6 @@ private fun toPose3D(inData: DoubleArray): Pose3d {
 
 private fun toPose2D(inData: DoubleArray): Pose2d {
     if (inData.size < 6) {
-        System.err.println("Bad LL 2D Pose Data!")
         return Pose2d()
     }
     val tran2d = Translation2d(inData[0], inData[1])

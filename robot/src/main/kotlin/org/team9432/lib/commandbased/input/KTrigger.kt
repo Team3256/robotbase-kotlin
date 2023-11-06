@@ -20,7 +20,7 @@ import java.util.function.BooleanSupplier
  *
  * This class is provided by the NewCommands VendorDep
  */
-class KTrigger(private val loop: EventLoop = KCommandScheduler.defaultButtonLoop, private val condition: BooleanSupplier): BooleanSupplier {
+class KTrigger(private val loop: EventLoop = KCommandScheduler.buttonLoop, private val condition: BooleanSupplier): BooleanSupplier {
     /**
      * Starts the given command whenever the condition changes from `false` to `true`.
      *

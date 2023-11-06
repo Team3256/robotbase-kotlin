@@ -29,10 +29,8 @@ object KCommandScheduler {
      *
      * @return a reference to the default [EventLoop] object polling buttons.
      */
-    val defaultButtonLoop = EventLoop()
+    val buttonLoop = EventLoop()
 
-    // The set of currently-registered buttons that will be polled every iteration.
-    private var activeButtonLoop = defaultButtonLoop
     private var isDisabled = false
 
     // Flag and queues for avoiding ConcurrentModificationException if commands are
@@ -154,11 +152,8 @@ object KCommandScheduler {
             watchdog.addEpoch(subsystem.javaClass.getSimpleName() + ".periodic()")
         }
 
-        // Cache the active instance to avoid concurrency problems if setActiveLoop() is called from inside the button bindings.
-        val loopCache = this.activeButtonLoop //TODO Is this needed
-
         // Poll buttons for new commands to add.
-        loopCache.poll()
+        buttonLoop.poll()
         watchdog.addEpoch("buttons.run()")
 
         inRunLoop = true

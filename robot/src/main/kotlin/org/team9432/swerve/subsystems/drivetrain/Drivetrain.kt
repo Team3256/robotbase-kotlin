@@ -15,12 +15,11 @@ import edu.wpi.first.wpilibj.RobotState
 import org.littletonrobotics.junction.Logger
 import org.team9432.Robot
 import org.team9432.Robot.Mode.*
-import org.team9432.lib.annotation.Logged
 import org.team9432.lib.commandbased.KSubsystem
 import org.team9432.lib.commandbased.commands.SimpleCommand
 import org.team9432.lib.drivers.gyro.GyroIO
-import org.team9432.lib.drivers.gyro.GyroIOInputsAutoLogged
 import org.team9432.lib.drivers.gyro.GyroIOSim
+import org.team9432.lib.drivers.gyro.LoggedGyroIOInputs
 import org.team9432.lib.wpilib.ChassisSpeeds
 import org.team9432.swerve.DrivetrainConstants
 import org.team9432.swerve.DrivetrainConstants.AngleConstants
@@ -29,12 +28,12 @@ import org.team9432.swerve.DrivetrainConstants.MODULE_TRANSLATIONS
 import org.team9432.swerve.DrivetrainConstants.PoseConstants
 
 object Drivetrain: KSubsystem() {
-    private val moduleInputs = List(4) { ModuleIOInputsAutoLogged() }
+    private val moduleInputs = List(4) { LoggedModuleIOInputs() }
     private val modules: List<ModuleIO> = when (Robot.mode) {
         REAL, REPLAY, SIM -> ModuleIO.Position.entries.map { ModuleIOSim(it) }
     }
 
-    private val gyroInputs = GyroIOInputsAutoLogged()
+    private val gyroInputs = LoggedGyroIOInputs()
     private val gyro: GyroIO = when (Robot.mode) {
         REAL, REPLAY, SIM -> GyroIOSim()
     }
