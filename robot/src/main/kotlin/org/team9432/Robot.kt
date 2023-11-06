@@ -11,6 +11,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader
 import org.littletonrobotics.junction.wpilog.WPILOGWriter
 import org.team9432.lib.commandbased.KCommandScheduler
 import org.team9432.lib.drivers.limelight.Limelight
+import org.team9432.lib.field.ChargedUp2023
 import org.team9432.robot.Controls
 
 
@@ -49,6 +50,7 @@ object Robot: LoggedRobot() {
 
         Controls
         Limelight
+        ChargedUp2023.displayAll()
     }
 
     override fun robotPeriodic() {
