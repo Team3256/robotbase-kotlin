@@ -1,0 +1,6 @@
+.gradle/
+.idea/
+build/
+*/build/
+
+/robot/src/main/kotlin/org/team9432/BuildConstants.java
