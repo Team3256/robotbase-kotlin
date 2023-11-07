@@ -11,7 +11,7 @@ object Controls {
     private val controller = KXboxController(0)
 
     init {
-        Drivetrain.defaultCommand = Drivetrain.fieldOrientedDriveCommand({ controller.leftY }, { controller.leftX }, { -controller.rightX })
+        Drivetrain.defaultCommand = Drivetrain.fieldOrientedDriveCommand({ -controller.leftY }, { -controller.leftX }, { -controller.rightX })
 
         controller.a.onTrue(InstantCommand { Limelight.setLEDMode(LimelightIONetworkTables.LEDMode.FORCE_ON) })
         controller.b.onTrue(InstantCommand { Limelight.setLEDMode(LimelightIONetworkTables.LEDMode.FORCE_OFF) })
