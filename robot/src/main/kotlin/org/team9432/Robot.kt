@@ -1,5 +1,7 @@
 package org.team9432
 
+import edu.wpi.first.math.geometry.Pose2d
+import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.net.PortForwarder
 import edu.wpi.first.wpilibj.PowerDistribution
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType
@@ -12,7 +14,11 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter
 import org.team9432.lib.commandbased.KCommandScheduler
 import org.team9432.lib.drivers.limelight.Limelight
 import org.team9432.lib.field.ChargedUp2023
+import org.team9432.lib.field.Point
+import org.team9432.lib.field.toPose2d
+import org.team9432.lib.trajectory.AStar
 import org.team9432.robot.Controls
+import org.team9432.robot.subsystems.drivetrain.Drivetrain
 
 
 /**
@@ -63,7 +69,18 @@ object Robot: LoggedRobot() {
 
     override fun teleopInit() {}
 
-    override fun teleopPeriodic() {}
+    private val pathfinder = AStar(obstacles = arrayOf(ChargedUp2023.redLoadingZone, ChargedUp2023.blueChargeStation, ChargedUp2023.blueLoadingZone, ChargedUp2023.redChargeStation))
+    override fun teleopPeriodic() {
+        val initialPose = Drivetrain.getPose()
+        val finalPose = Point(8.0, 3.0).toPose2d()
+        val waypoints = pathfinder.findPath(initialPose, finalPose)
+
+        Logger.recordOutput("Planner/Start", initialPose)
+        Logger.recordOutput("Planner/End", finalPose)
+        if (waypoints != null) {
+            Logger.recordOutput("Planner/Path", *waypoints.toTypedArray())
+        }
+    }
 
     override fun disabledInit() {}
 

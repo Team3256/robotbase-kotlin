@@ -130,7 +130,7 @@ object Drivetrain: KSubsystem() {
         for (i in modules.indices) modules[i].setState(states[i])
     }
 
-    private fun getPose(): Pose2d = poseEstimator.estimatedPosition
+    fun getPose(): Pose2d = poseEstimator.estimatedPosition
 
     private var yaw: Double
         get() = gyroInputs.yaw
