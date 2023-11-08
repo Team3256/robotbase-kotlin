@@ -72,7 +72,7 @@ object Robot: LoggedRobot() {
     private val pathfinder = AStar(obstacles = arrayOf(ChargedUp2023.redLoadingZone, ChargedUp2023.blueChargeStation, ChargedUp2023.blueLoadingZone, ChargedUp2023.redChargeStation))
     override fun teleopPeriodic() {
         val initialPose = Drivetrain.getPose()
-        val finalPose = Point(8.0, 3.0).toPose2d()
+        val finalPose = Point(12.0, 6.0).toPose2d()
         val waypoints = pathfinder.findPath(initialPose, finalPose)
 
         Logger.recordOutput("Planner/Start", initialPose)

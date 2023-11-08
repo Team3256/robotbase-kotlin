@@ -32,8 +32,29 @@ class AStar(precision: Double = 4.0, private vararg val obstacles: Region, displ
         }
     }
 
+    private fun optimizePath(waypoints: List<Point>): List<Point> {
+        val newPath = waypoints.toMutableList()
+        i@for (i in 0..<newPath.size) {
+            val a = newPath.getOrNull(i) ?: break
+
+            val currentIndex = 1
+            j@while (true) {
+                val c = newPath.getOrNull(i + 1 + currentIndex) ?: break@i
+                val line = Line(a, c)
+                val blocked = obstacles.any { it.intersects(line) }
+                if (!blocked) {
+                    newPath.removeAt(i + currentIndex)
+                }
+                if (blocked) break@j
+            }
+        }
+
+        println("StartLength: ${waypoints.size}, EndLength: ${newPath.size}")
+        return newPath
+    }
+
     /** This function takes Pose2d positions and converts them into a grid system that is usable by A* */
-    fun findPath(initialPose: Pose2d, finalPose: Pose2d, printTime: Boolean = false): MutableList<Pose2d>? {
+    fun findPath(initialPose: Pose2d, finalPose: Pose2d, printTime: Boolean = false): List<Pose2d>? {
         val start = if (printTime) Instant.now() else null
         val initialCoordinate = fieldToCoordinate(initialPose)
         val finalCoordinate = fieldToCoordinate(finalPose)
@@ -47,7 +68,7 @@ class AStar(precision: Double = 4.0, private vararg val obstacles: Region, displ
         if (printTime) println("Path generation time: ${Instant.now().toEpochMilli() - start!!.toEpochMilli()}ms")
 
 //        println("Start: (x: ${initialCoordinate.x}, y: ${initialCoordinate.y}) End: (x: ${finalCoordinate.x}, y: ${finalCoordinate.y}) Cost: $cost Path: $path")
-        return waypoints
+        return optimizePath(waypoints.map { it.toPoint() }).map { it.toPose2d() }
     }
 
     /**
