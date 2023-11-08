@@ -14,7 +14,7 @@ import kotlin.math.roundToInt
  * Higher values will take longer, but the path will be defined in more/smaller steps and is therefore more precise
  * Default value is 4
  */
-class AStar(precision: Double = 4.0, private vararg val obstacles: Region, displayGrid: Boolean = false) {
+class AStar(precision: Double = 2.0, private vararg val obstacles: Region, displayGrid: Boolean = false) {
     private val gridWidth = (EvergreenField.FIELD_WIDTH * precision).roundToInt()
     private val gridHeight = (EvergreenField.FIELD_HEIGHT * precision).roundToInt()
 
@@ -30,6 +30,26 @@ class AStar(precision: Double = 4.0, private vararg val obstacles: Region, displ
             }
             EvergreenField.recordPoints("Planner/Tiles", mutableGrid.map { coordinateToField(it).toPoint() })
         }
+    }
+
+    /** This function takes Pose2d positions and converts them into a grid system that is usable by A* */
+    fun findPath(initialPose: Pose2d, finalPose: Pose2d, printTime: Boolean = false): List<Pose2d>? {
+        val start = if (printTime) Instant.now() else null
+        val initialCoordinate = fieldToCoordinate(initialPose)
+        val finalCoordinate = fieldToCoordinate(finalPose)
+
+        val (path, cost) = searchAStar(initialCoordinate, finalCoordinate) ?: return null
+
+        val waypoints = path.map { coordinateToField(it) }.toMutableList()
+        waypoints.add(finalPose)
+        waypoints.add(0, initialPose)
+
+        val optimizedPath = optimizePath(waypoints.map { it.toPoint() }).map { it.toPose2d() }
+
+        if (printTime) println("Path generation time: ${Instant.now().toEpochMilli() - start!!.toEpochMilli()}ms")
+
+//        println("Start: (x: ${initialCoordinate.x}, y: ${initialCoordinate.y}) End: (x: ${finalCoordinate.x}, y: ${finalCoordinate.y}) Cost: $cost Path: $path")
+        return optimizedPath
     }
 
     /**
@@ -50,24 +70,6 @@ class AStar(precision: Double = 4.0, private vararg val obstacles: Region, displ
         }
 
         return newPath
-    }
-
-    /** This function takes Pose2d positions and converts them into a grid system that is usable by A* */
-    fun findPath(initialPose: Pose2d, finalPose: Pose2d, printTime: Boolean = false): List<Pose2d>? {
-        val start = if (printTime) Instant.now() else null
-        val initialCoordinate = fieldToCoordinate(initialPose)
-        val finalCoordinate = fieldToCoordinate(finalPose)
-
-        val (path, cost) = searchAStar(initialCoordinate, finalCoordinate) ?: return null
-
-        val waypoints = path.map { coordinateToField(it) }.toMutableList()
-        waypoints.add(finalPose)
-        waypoints.add(0, initialPose)
-
-        if (printTime) println("Path generation time: ${Instant.now().toEpochMilli() - start!!.toEpochMilli()}ms")
-
-//        println("Start: (x: ${initialCoordinate.x}, y: ${initialCoordinate.y}) End: (x: ${finalCoordinate.x}, y: ${finalCoordinate.y}) Cost: $cost Path: $path")
-        return optimizePath(waypoints.map { it.toPoint() }).map { it.toPose2d() }
     }
 
     /**
