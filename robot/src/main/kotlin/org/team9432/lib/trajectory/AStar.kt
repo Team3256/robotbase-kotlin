@@ -3,7 +3,7 @@ package org.team9432.lib.trajectory
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import org.team9432.lib.field.BaseRegion
-import org.team9432.lib.field.ChargedUp2023
+import org.team9432.lib.field.EvergreenField
 import org.team9432.lib.field.toPoint
 import java.time.Instant
 import kotlin.math.abs
@@ -17,8 +17,8 @@ import kotlin.math.roundToInt
  * Default value is 4
  */
 class AStar(precision: Double = 4.0, private vararg val obstacles: BaseRegion, displayGrid: Boolean = false) {
-    private val gridWidth = (ChargedUp2023.FIELD_WIDTH * precision).roundToInt()
-    private val gridHeight = (ChargedUp2023.FIELD_HEIGHT * precision).roundToInt()
+    private val gridWidth = (EvergreenField.FIELD_WIDTH * precision).roundToInt()
+    private val gridHeight = (EvergreenField.FIELD_HEIGHT * precision).roundToInt()
 
     init {
         println("X size: $gridWidth, Y size: $gridHeight")
@@ -30,7 +30,7 @@ class AStar(precision: Double = 4.0, private vararg val obstacles: BaseRegion, d
                     mutableGrid.add(Coordinate(xCoordinate, yCoordinate))
                 }
             }
-            ChargedUp2023.displayPoints("Planner/Tiles", mutableGrid.map { coordinateToField(it).toPoint() })
+            EvergreenField.recordPoints("Planner/Tiles", mutableGrid.map { coordinateToField(it).toPoint() })
         }
     }
 
@@ -139,15 +139,15 @@ class AStar(precision: Double = 4.0, private vararg val obstacles: BaseRegion, d
 
     /** Converts a pose from the field coordinate system to the one used by A* */
     private fun fieldToCoordinate(pose: Pose2d): Coordinate {
-        val newX = pose.x / (ChargedUp2023.FIELD_WIDTH / gridWidth)
-        val newY = pose.y / (ChargedUp2023.FIELD_HEIGHT / gridHeight)
+        val newX = pose.x / (EvergreenField.FIELD_WIDTH / gridWidth)
+        val newY = pose.y / (EvergreenField.FIELD_HEIGHT / gridHeight)
         return Coordinate(newX.roundToInt(), newY.roundToInt())
     }
 
     /** Converts a pose from the A* coordinate system to the field */
     private fun coordinateToField(coordinate: Coordinate): Pose2d {
-        val newX = coordinate.x * (ChargedUp2023.FIELD_WIDTH / gridWidth)
-        val newY = coordinate.y * (ChargedUp2023.FIELD_HEIGHT / gridHeight)
+        val newX = coordinate.x * (EvergreenField.FIELD_WIDTH / gridWidth)
+        val newY = coordinate.y * (EvergreenField.FIELD_HEIGHT / gridHeight)
         return Pose2d(newX, newY, Rotation2d())
     }
 
