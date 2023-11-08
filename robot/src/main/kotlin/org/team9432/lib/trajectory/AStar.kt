@@ -32,24 +32,23 @@ class AStar(precision: Double = 4.0, private vararg val obstacles: Region, displ
         }
     }
 
+    /**
+     * Method to remove extra waypoints from a generated path.
+     * Starting with the path points ABCDE it checks: Is there a straight line from A to C? If so, discard B and check A to D, etc. If not, start the algorithm again from point B
+     */
     private fun optimizePath(waypoints: List<Point>): List<Point> {
         val newPath = waypoints.toMutableList()
-        i@for (i in 0..<newPath.size) {
+        main@ for (i in 0..<newPath.size) {
             val a = newPath.getOrNull(i) ?: break
 
-            val currentIndex = 1
-            j@while (true) {
-                val c = newPath.getOrNull(i + 1 + currentIndex) ?: break@i
+            do {
+                val c = newPath.getOrNull(i + 2) ?: break@main
                 val line = Line(a, c)
                 val blocked = obstacles.any { it.intersects(line) }
-                if (!blocked) {
-                    newPath.removeAt(i + currentIndex)
-                }
-                if (blocked) break@j
-            }
+                if (!blocked) newPath.removeAt(i + 1)
+            } while (!blocked)
         }
 
-        println("StartLength: ${waypoints.size}, EndLength: ${newPath.size}")
         return newPath
     }
 
