@@ -6,8 +6,8 @@ import edu.wpi.first.math.util.Units
 import edu.wpi.first.wpilibj.DriverStation.Alliance
 import org.littletonrobotics.junction.Logger
 import org.team9432.lib.field.EvergreenField.FIELD_HEIGHT
-import org.team9432.lib.field.EvergreenField.recordPoints
 import org.team9432.lib.field.EvergreenField.flip
+import org.team9432.lib.util.LoggerUtil.recordPoints
 import java.util.*
 
 

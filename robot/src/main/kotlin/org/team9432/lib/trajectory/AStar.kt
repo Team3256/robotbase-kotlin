@@ -3,6 +3,7 @@ package org.team9432.lib.trajectory
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import org.team9432.lib.field.*
+import org.team9432.lib.util.LoggerUtil
 import java.time.Instant
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -28,7 +29,7 @@ class AStar(precision: Double = 2.0, private vararg val obstacles: Region, displ
                     mutableGrid.add(Coordinate(xCoordinate, yCoordinate))
                 }
             }
-            EvergreenField.recordPoints("Planner/Tiles", mutableGrid.map { coordinateToField(it).toPoint() })
+            LoggerUtil.recordPoints("Planner/Tiles", mutableGrid.map { coordinateToField(it).toPoint() })
         }
     }
 
