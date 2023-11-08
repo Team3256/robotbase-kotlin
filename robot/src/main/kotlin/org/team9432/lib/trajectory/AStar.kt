@@ -2,9 +2,7 @@ package org.team9432.lib.trajectory
 
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
-import org.team9432.lib.field.BaseRegion
-import org.team9432.lib.field.EvergreenField
-import org.team9432.lib.field.toPoint
+import org.team9432.lib.field.*
 import java.time.Instant
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -16,7 +14,7 @@ import kotlin.math.roundToInt
  * Higher values will take longer, but the path will be defined in more/smaller steps and is therefore more precise
  * Default value is 4
  */
-class AStar(precision: Double = 4.0, private vararg val obstacles: BaseRegion, displayGrid: Boolean = false) {
+class AStar(precision: Double = 4.0, private vararg val obstacles: Region, displayGrid: Boolean = false) {
     private val gridWidth = (EvergreenField.FIELD_WIDTH * precision).roundToInt()
     private val gridHeight = (EvergreenField.FIELD_HEIGHT * precision).roundToInt()
 

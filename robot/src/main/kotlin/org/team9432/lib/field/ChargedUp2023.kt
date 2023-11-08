@@ -13,12 +13,12 @@ import java.util.*
 
 @Suppress("MemberVisibilityCanBePrivate")
 object ChargedUp2023 {
-    val redLoadingZone: Region = Region(Rectangle(0.0, 6.75, 6.71, 1.265), Rectangle(0.0, 6.75 - 1.24, 3.36, 1.24))
-    val blueLoadingZone: Region = Region(Rectangle(0.0, 6.75, 6.71, 1.265).flip(), Rectangle(0.0, 6.75 - 1.24, 3.36, 1.24).flip())
+    val redLoadingZone: RectangleGroup = RectangleGroup(Rectangle(0.0, 6.75, 6.71, 1.265), Rectangle(0.0, 6.75 - 1.24, 3.36, 1.24))
+    val blueLoadingZone: RectangleGroup = RectangleGroup(Rectangle(0.0, 6.75, 6.71, 1.265).flip(), Rectangle(0.0, 6.75 - 1.24, 3.36, 1.24).flip())
     val blueChargeStation: Rectangle = Rectangle(2.9, FIELD_HEIGHT - 6.4955, 1.95, 2.47)
     val redChargeStation: Rectangle = blueChargeStation.flip()
-    val blueCommunity: Region = Region(Rectangle(1.37, FIELD_HEIGHT - 3.98, 1.985, 1.475), Rectangle(1.37, 0.0, 3.54, 4.0337))
-    val redCommunity: Region = Region(Rectangle(1.37, FIELD_HEIGHT - 3.98, 1.985, 1.475).flip(), Rectangle(1.37, 0.0, 3.54, 4.0337).flip())
+    val blueCommunity: RectangleGroup = RectangleGroup(Rectangle(1.37, FIELD_HEIGHT - 3.98, 1.985, 1.475), Rectangle(1.37, 0.0, 3.54, 4.0337))
+    val redCommunity: RectangleGroup = RectangleGroup(Rectangle(1.37, FIELD_HEIGHT - 3.98, 1.985, 1.475).flip(), Rectangle(1.37, 0.0, 3.54, 4.0337).flip())
 
     val stagingMarkers = listOf(
         Point(7.0775, FIELD_HEIGHT - 7.085),
