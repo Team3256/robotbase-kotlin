@@ -14,12 +14,12 @@ import java.util.*
 
 @Suppress("MemberVisibilityCanBePrivate")
 object ChargedUp2023 {
-    val redLoadingZone: RectangleGroup = RectangleGroup(Rectangle(0.0, 6.75, 6.71, 1.265), Rectangle(0.0, 6.75 - 1.24, 3.36, 1.24))
-    val blueLoadingZone: RectangleGroup = RectangleGroup(Rectangle(0.0, 6.75, 6.71, 1.265).flip(), Rectangle(0.0, 6.75 - 1.24, 3.36, 1.24).flip())
+    val redLoadingZone = arrayOf(Rectangle(0.0, 6.75, 6.71, 1.265), Rectangle(0.0, 6.75 - 1.24, 3.36, 1.24))
+    val blueLoadingZone = arrayOf(Rectangle(0.0, 6.75, 6.71, 1.265).flip(), Rectangle(0.0, 6.75 - 1.24, 3.36, 1.24).flip())
     val blueChargeStation: Rectangle = Rectangle(2.9, FIELD_HEIGHT - 6.4955, 1.95, 2.47)
     val redChargeStation: Rectangle = blueChargeStation.flip()
-    val blueCommunity: RectangleGroup = RectangleGroup(Rectangle(1.37, FIELD_HEIGHT - 3.98, 1.985, 1.475), Rectangle(1.37, 0.0, 3.54, 4.0337))
-    val redCommunity: RectangleGroup = RectangleGroup(Rectangle(1.37, FIELD_HEIGHT - 3.98, 1.985, 1.475).flip(), Rectangle(1.37, 0.0, 3.54, 4.0337).flip())
+    val blueCommunity = arrayOf(Rectangle(1.37, FIELD_HEIGHT - 3.98, 1.985, 1.475), Rectangle(1.37, 0.0, 3.54, 4.0337))
+    val redCommunity = arrayOf(Rectangle(1.37, FIELD_HEIGHT - 3.98, 1.985, 1.475).flip(), Rectangle(1.37, 0.0, 3.54, 4.0337).flip())
 
     val navigationWaypoints = setOf(
         Point(2.125, 0.75),
@@ -59,12 +59,12 @@ object ChargedUp2023 {
     val blueGrids = listOf(blueLeft, blueCoOp, blueRight)
 
     fun displayAll() {
-        recordPoints("Field/Red Loading Zone", redLoadingZone.getPoints())
-        recordPoints("Field/Blue Loading Zone", blueLoadingZone.getPoints())
+        recordPoints("Field/Red Loading Zone", redLoadingZone[0].getPoints() + redLoadingZone[1].getPoints())
+        recordPoints("Field/Blue Loading Zone", blueLoadingZone[0].getPoints() + blueLoadingZone[1].getPoints() )
         recordPoints("Field/Blue Charge Station", blueChargeStation.getPoints())
         recordPoints("Field/Red Charge Station", redChargeStation.getPoints())
-        recordPoints("Field/Blue Community", blueCommunity.getPoints())
-        recordPoints("Field/Red Community", redCommunity.getPoints())
+        recordPoints("Field/Blue Community", blueCommunity[0].getPoints() + blueCommunity[1].getPoints())
+        recordPoints("Field/Red Community", redCommunity[0].getPoints() + redCommunity[1].getPoints())
         recordPoints("Field/StagingMarkers", stagingMarkers)
 
         val nodePoses = mutableListOf<Point>()

@@ -17,32 +17,40 @@ import kotlin.math.sqrt
  * Higher values will take longer, but the path will be defined in more/smaller steps and is therefore more precise
  * Default value is 4
  */
-class AStar(vararg obstacles: Region) {
+class AStar(vararg obstacles: Rectangle) {
     private val obstacles = obstacles.map { it.expand(Units.inchesToMeters(OBSTACLE_TOLERANCE)) }
-    private val waypoints: Set<Point>
+    private val baseWaypoints: Set<Point>
+    private var waypoints: Set<Point>
 
     init {
         val obstaclePoints = mutableListOf<Point>()
         this.obstacles.forEach { obstaclePoints.addAll(it.getPoints()) }
         LoggerUtil.recordPoints("Planner/Obstacles", obstaclePoints)
 
-        waypoints = ChargedUp2023.navigationWaypoints.filterNot { it.isInObstacle() }.toSet()
-        LoggerUtil.recordPoints("Planner/Waypoints", waypoints)
+        // Remove any permanent waypoints that are in an obstacle
+        // This is basically a free operation because it can be run once while the robot is waiting on the field before auto
+        baseWaypoints = ChargedUp2023.navigationWaypoints.filterNot { it.isInObstacle() }.toSet()
+
+        waypoints = baseWaypoints.toMutableSet()
+
+        LoggerUtil.recordPoints("Planner/Waypoints", baseWaypoints)
     }
 
     /** This function takes Pose2d positions and converts them into a grid system that is usable by A* */
     fun findPath(initialPose: Pose2d, finalPose: Pose2d, printTime: Boolean = false): List<Pose2d>? {
         val start = if (printTime) Instant.now() else null
 
-        // Find the nearest waypoint to the start and end poses
-        val initialCoordinate = waypoints.minBy { heuristicDistance(it, initialPose.toPoint()) }
-        val finalCoordinate = waypoints.minBy { heuristicDistance(it, finalPose.toPoint()) }
+        val wp = baseWaypoints.toMutableSet()
+        wp.add(initialPose.toPoint())
+        wp.add(finalPose.toPoint())
+        waypoints = wp
+
+        val initialCoordinate = initialPose.toPoint()
+        val finalCoordinate = finalPose.toPoint()
 
         val (path, cost) = searchAStar(initialCoordinate, finalCoordinate) ?: return null
 
         val waypoints = path.map { (it.toPose2d()) }.toMutableList()
-        waypoints.add(finalPose)
-        waypoints.add(0, initialPose)
 
         val optimizedPath = optimizePath(waypoints.map { it.toPoint() }).map { it.toPose2d() }
 
@@ -66,7 +74,10 @@ class AStar(vararg obstacles: Region) {
             do {
                 val c = newPath.getOrNull(i + 2) ?: break@main
                 val line = Line(a, c)
-                val blocked = obstacles.any { it.intersects(line) }
+
+                val obstacles = reduceObstaclesAroundPoint(a)
+
+                val blocked = obstacles.any { it.intersectsLine(line) }
                 if (!blocked) newPath.removeAt(i + 1)
             } while (!blocked)
         }
@@ -131,7 +142,10 @@ class AStar(vararg obstacles: Region) {
     }
 
     // Any waypoint can be moved to so long as there isn't an obstacle in the way
-    private fun getNeighbors(coordinate: Point) = waypoints.filterNot { obstacles.any { o -> o.intersects(Line(it, coordinate)) } }
+    private fun getNeighbors(point: Point): List<Point> {
+        val obstacles = reduceObstaclesAroundPoint(point)
+        return waypoints.filterNot { obstacles.any { o -> o.intersectsLine(Line(it, point)) } }
+    }
 
     private fun Point.isInObstacle() = obstacles.any { it.contains(this) }
 
@@ -145,7 +159,22 @@ class AStar(vararg obstacles: Region) {
     private fun getMoveCost(from: Point, to: Point): Double {
         // Basically, if the line goes through a wall, don't follow it. If not, the cost is the length of the line.
         val path = Line(Point(from.x, from.y), Point(to.x, to.y))
-        if (obstacles.any { it.intersects(path) }) return Double.MAX_VALUE
+
+        val obstacles = reduceObstaclesAroundPoint(from)
+        if (obstacles.any { it.intersectsLine(path) }) return Double.MAX_VALUE
+
         return heuristicDistance(from, to)
+    }
+
+    private fun reduceObstaclesAroundPoint(point: Point): List<Rectangle> {
+        // If the point is already in an obstacle, temporarily replace it with its smaller version, so it still can generate a path out of the area
+        // If it just deleted the obstacle, it would make a path that would go straight through the rest of it without trying to get back out
+        return if (point.isInObstacle()) {
+            val reducedObstacles = obstacles.toMutableList()
+            val containingObstacle = obstacles.first { it.contains(point) }
+            reducedObstacles.remove(containingObstacle)
+            reducedObstacles.add(containingObstacle.expand(-Units.inchesToMeters(OBSTACLE_TOLERANCE)))
+            reducedObstacles
+        } else obstacles
     }
 }

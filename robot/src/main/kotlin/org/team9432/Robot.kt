@@ -54,7 +54,7 @@ object Robot: LoggedRobot() {
             PortForwarder.add(port, "10.94.32.11", port)
         }
 
-        pathfinder = AStar(ChargedUp2023.redLoadingZone, ChargedUp2023.blueChargeStation, ChargedUp2023.blueLoadingZone, ChargedUp2023.redChargeStation)
+        pathfinder = AStar(*ChargedUp2023.redLoadingZone, ChargedUp2023.blueChargeStation, *ChargedUp2023.blueLoadingZone, ChargedUp2023.redChargeStation)
 
         Controls
         Limelight
@@ -74,7 +74,7 @@ object Robot: LoggedRobot() {
     override fun teleopPeriodic() {
         val initialPose = Drivetrain.getPose()
         val finalPose = Point(12.0, 6.0).toPose2d()
-        val waypoints = pathfinder.findPath(initialPose, finalPose, printTime = true)
+        val waypoints = pathfinder.findPath(initialPose, finalPose)
 
         Logger.recordOutput("Planner/Start", initialPose)
         Logger.recordOutput("Planner/End", finalPose)
