@@ -1,12 +1,12 @@
 package org.team9432.lib.trajectory
 
 import edu.wpi.first.math.geometry.Pose2d
-import edu.wpi.first.math.geometry.Rotation2d
+import org.littletonrobotics.junction.Logger
 import org.team9432.lib.field.*
-import org.team9432.lib.util.LoggerUtil
 import java.time.Instant
 import kotlin.math.abs
-import kotlin.math.roundToInt
+import kotlin.math.sqrt
+import org.team9432.lib.field.ChargedUp2023.navigationWaypoints as waypoints
 
 /**
  * A* implementation from https://rosettacode.org/wiki/A*_search_algorithm#Kotlin
@@ -15,37 +15,24 @@ import kotlin.math.roundToInt
  * Higher values will take longer, but the path will be defined in more/smaller steps and is therefore more precise
  * Default value is 4
  */
-class AStar(precision: Double = 2.0, private vararg val obstacles: Region, displayGrid: Boolean = false) {
-    private val gridWidth = (EvergreenField.FIELD_WIDTH * precision).roundToInt()
-    private val gridHeight = (EvergreenField.FIELD_HEIGHT * precision).roundToInt()
-
-    init {
-        println("X size: $gridWidth, Y size: $gridHeight")
-
-        if (displayGrid) {
-            val mutableGrid = mutableListOf<Coordinate>()
-            for (xCoordinate in 0..gridWidth) {
-                for (yCoordinate in 0..gridHeight) {
-                    mutableGrid.add(Coordinate(xCoordinate, yCoordinate))
-                }
-            }
-            LoggerUtil.recordPoints("Planner/Tiles", mutableGrid.map { coordinateToField(it).toPoint() })
-        }
-    }
-
+class AStar(private vararg val obstacles: Region) {
     /** This function takes Pose2d positions and converts them into a grid system that is usable by A* */
     fun findPath(initialPose: Pose2d, finalPose: Pose2d, printTime: Boolean = false): List<Pose2d>? {
         val start = if (printTime) Instant.now() else null
-        val initialCoordinate = fieldToCoordinate(initialPose)
-        val finalCoordinate = fieldToCoordinate(finalPose)
+
+        // Find the nearest waypoint to the start and end poses
+        val initialCoordinate = waypoints.minBy { heuristicDistance(it, initialPose.toPoint()) }
+        val finalCoordinate = waypoints.minBy { heuristicDistance(it, finalPose.toPoint()) }
 
         val (path, cost) = searchAStar(initialCoordinate, finalCoordinate) ?: return null
 
-        val waypoints = path.map { coordinateToField(it) }.toMutableList()
+        val waypoints = path.map { (it.toPose2d()) }.toMutableList()
         waypoints.add(finalPose)
         waypoints.add(0, initialPose)
 
         val optimizedPath = optimizePath(waypoints.map { it.toPoint() }).map { it.toPose2d() }
+
+        Logger.recordOutput("Planner/WaypointPath", *waypoints.toTypedArray())
 
         if (printTime) println("Path generation time: ${Instant.now().toEpochMilli() - start!!.toEpochMilli()}ms")
 
@@ -78,9 +65,9 @@ class AStar(precision: Double = 2.0, private vararg val obstacles: Region, displ
      *
      * The Grid contains the details of the barriers and methods which supply the neighboring vertices and the cost of movement between 2 cells.
      */
-    private fun searchAStar(start: Coordinate, finish: Coordinate): Pair<List<Coordinate>, Double>? {
+    private fun searchAStar(start: Point, finish: Point): Pair<List<Point>, Double>? {
         /** Use the cameFrom values to backtrack to the start position to generate the path */
-        fun generatePath(currentPos: Coordinate, cameFrom: Map<Coordinate, Coordinate>): List<Coordinate> {
+        fun generatePath(currentPos: Point, cameFrom: Map<Point, Point>): List<Point> {
             val path = mutableListOf(currentPos)
             var current = currentPos
             while (cameFrom.containsKey(current)) {
@@ -91,11 +78,11 @@ class AStar(precision: Double = 2.0, private vararg val obstacles: Region, displ
         }
 
         val openVertices = mutableSetOf(start)
-        val closedVertices = mutableSetOf<Coordinate>()
+        val closedVertices = mutableSetOf<Point>()
         val costFromStart = mutableMapOf(start to 0.0)
         val estimatedTotalCost = mutableMapOf(start to heuristicDistance(start, finish))
 
-        val cameFrom = mutableMapOf<Coordinate, Coordinate>() // Used to generate path by back tracking
+        val cameFrom = mutableMapOf<Point, Point>() // Used to generate path by back tracking
 
         while (openVertices.size > 0) {
             val currentPos = openVertices.minBy { estimatedTotalCost.getValue(it) }
@@ -129,48 +116,20 @@ class AStar(precision: Double = 2.0, private vararg val obstacles: Region, displ
         return null
     }
 
-    private val widthRange = 0 until gridWidth
-    private val heightRange = 0 until gridHeight
-    private fun inGrid(it: Coordinate) = (it.x in widthRange) && (it.y in heightRange)
+    // Any waypoint can be moved to so long as there isn't an obstacle in the way
+    private fun getNeighbors(coordinate: Point) = waypoints.filterNot { obstacles.any { o -> o.intersects(Line(it, coordinate)) } }
 
-    private val validMoves = mapOf( // translation to cost, diagonal moves are slightly more expensive
-        Coordinate(1, 0) to 1.0,
-        Coordinate(-1, 0) to 1.0,
-        Coordinate(0, 1) to 1.0,
-        Coordinate(0, -1) to 1.0,
-        Coordinate(1, 1) to 1.5,
-        Coordinate(-1, 1) to 1.5,
-        Coordinate(1, -1) to 1.5,
-        Coordinate(-1, -1) to 1.5
-    )
-
-    private fun getNeighbors(coordinate: Coordinate) = validMoves.keys.map { Coordinate(coordinate.x + it.x, coordinate.y + it.y) }.filter { inGrid(it) }
-
-    private fun heuristicDistance(start: Coordinate, finish: Coordinate): Double {
+    /** Gets the distance between two points */
+    private fun heuristicDistance(start: Point, finish: Point): Double {
         val dx = abs(start.x - finish.x)
         val dy = abs(start.y - finish.y)
-        return (dx + dy) + (-2) * minOf(dx, dy).toDouble()
+        return sqrt((dx * dx) + (dy * dy)) // Triangles! A^2 + B^2 = C^2
     }
 
-    private fun getMoveCost(from: Coordinate, to: Coordinate): Double {
-        if (obstacles.any { it.contains(coordinateToField(to).toPoint()) }) return Double.MAX_VALUE // Passing through walls is bad
-        val movement = Coordinate(from.x - to.x, from.y - to.y)
-        return validMoves[movement]!!
+    private fun getMoveCost(from: Point, to: Point): Double {
+        // Basically, if the line goes through a wall, don't follow it. If not, the cost is the length of the line.
+        val path = Line(Point(from.x, from.y), Point(to.x, to.y))
+        if (obstacles.any { it.intersects(path) }) return Double.MAX_VALUE
+        return heuristicDistance(from, to)
     }
-
-    /** Converts a pose from the field coordinate system to the one used by A* */
-    private fun fieldToCoordinate(pose: Pose2d): Coordinate {
-        val newX = pose.x / (EvergreenField.FIELD_WIDTH / gridWidth)
-        val newY = pose.y / (EvergreenField.FIELD_HEIGHT / gridHeight)
-        return Coordinate(newX.roundToInt(), newY.roundToInt())
-    }
-
-    /** Converts a pose from the A* coordinate system to the field */
-    private fun coordinateToField(coordinate: Coordinate): Pose2d {
-        val newX = coordinate.x * (EvergreenField.FIELD_WIDTH / gridWidth)
-        val newY = coordinate.y * (EvergreenField.FIELD_HEIGHT / gridHeight)
-        return Pose2d(newX, newY, Rotation2d())
-    }
-
-    data class Coordinate(val x: Int, val y: Int)
 }

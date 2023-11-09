@@ -6,6 +6,7 @@ import edu.wpi.first.math.util.Units
 import edu.wpi.first.wpilibj.DriverStation.Alliance
 import org.littletonrobotics.junction.Logger
 import org.team9432.lib.field.EvergreenField.FIELD_HEIGHT
+import org.team9432.lib.field.EvergreenField.FIELD_MIDLINE
 import org.team9432.lib.field.EvergreenField.flip
 import org.team9432.lib.util.LoggerUtil.recordPoints
 import java.util.*
@@ -19,6 +20,22 @@ object ChargedUp2023 {
     val redChargeStation: Rectangle = blueChargeStation.flip()
     val blueCommunity: RectangleGroup = RectangleGroup(Rectangle(1.37, FIELD_HEIGHT - 3.98, 1.985, 1.475), Rectangle(1.37, 0.0, 3.54, 4.0337))
     val redCommunity: RectangleGroup = RectangleGroup(Rectangle(1.37, FIELD_HEIGHT - 3.98, 1.985, 1.475).flip(), Rectangle(1.37, 0.0, 3.54, 4.0337).flip())
+
+    val navigationWaypoints = setOf(
+        Point(2.125, 0.75),
+        Point(2.125, 4.625),
+        Point(5.0, 4.625),
+        Point(5.0, 0.75),
+        Point(6.0, 7.375),
+
+        Point(2.125, 0.75).flip(),
+        Point(2.125, 4.625).flip(),
+        Point(5.0, 4.625).flip(),
+        Point(5.0, 0.75).flip(),
+        Point(6.0, 7.375).flip(),
+
+        Point(FIELD_MIDLINE, 7.375) // this one's in the middle and doesn't need flipping
+    )
 
     val stagingMarkers = listOf(
         Point(7.0775, FIELD_HEIGHT - 7.085),
@@ -48,6 +65,7 @@ object ChargedUp2023 {
         recordPoints("Field/Blue Community", blueCommunity.getPoints())
         recordPoints("Field/Red Community", redCommunity.getPoints())
         recordPoints("Field/StagingMarkers", stagingMarkers)
+        recordPoints("Planner/Waypoints", navigationWaypoints)
 
         val nodePoses = mutableListOf<Point>()
         val allGrids = mutableListOf<Grid>()

@@ -1,7 +1,5 @@
 package org.team9432
 
-import edu.wpi.first.math.geometry.Pose2d
-import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.net.PortForwarder
 import edu.wpi.first.wpilibj.PowerDistribution
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType
@@ -69,7 +67,7 @@ object Robot: LoggedRobot() {
 
     override fun teleopInit() {}
 
-    private val pathfinder = AStar(precision = 2.0, obstacles = arrayOf(ChargedUp2023.redLoadingZone, ChargedUp2023.blueChargeStation, ChargedUp2023.blueLoadingZone, ChargedUp2023.redChargeStation))
+    private val pathfinder = AStar(ChargedUp2023.redLoadingZone, ChargedUp2023.blueChargeStation, ChargedUp2023.blueLoadingZone, ChargedUp2023.redChargeStation)
     override fun teleopPeriodic() {
         val initialPose = Drivetrain.getPose()
         val finalPose = Point(12.0, 6.0).toPose2d()
