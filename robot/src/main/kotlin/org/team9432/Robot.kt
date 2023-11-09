@@ -32,6 +32,8 @@ import org.team9432.robot.subsystems.drivetrain.Drivetrain
 object Robot: LoggedRobot() {
     val mode = Mode.SIM
 
+    private lateinit var pathfinder: AStar
+
     override fun robotInit() {
         Logger.recordMetadata("ProjectName", "Swerve") // Set a metadata value
 
@@ -52,6 +54,8 @@ object Robot: LoggedRobot() {
             PortForwarder.add(port, "10.94.32.11", port)
         }
 
+        pathfinder = AStar(ChargedUp2023.redLoadingZone, ChargedUp2023.blueChargeStation, ChargedUp2023.blueLoadingZone, ChargedUp2023.redChargeStation)
+
         Controls
         Limelight
         ChargedUp2023.displayAll()
@@ -67,7 +71,6 @@ object Robot: LoggedRobot() {
 
     override fun teleopInit() {}
 
-    private val pathfinder = AStar(ChargedUp2023.redLoadingZone, ChargedUp2023.blueChargeStation, ChargedUp2023.blueLoadingZone, ChargedUp2023.redChargeStation)
     override fun teleopPeriodic() {
         val initialPose = Drivetrain.getPose()
         val finalPose = Point(12.0, 6.0).toPose2d()

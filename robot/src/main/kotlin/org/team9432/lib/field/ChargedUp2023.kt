@@ -24,17 +24,18 @@ object ChargedUp2023 {
     val navigationWaypoints = setOf(
         Point(2.125, 0.75),
         Point(2.125, 4.625),
-        Point(5.0, 4.625),
-        Point(5.0, 0.75),
+        Point(5.5, 4.625),
+        Point(5.5, 0.75),
         Point(6.0, 7.375),
 
         Point(2.125, 0.75).flip(),
         Point(2.125, 4.625).flip(),
-        Point(5.0, 4.625).flip(),
-        Point(5.0, 0.75).flip(),
+        Point(5.5, 4.625).flip(),
+        Point(5.5, 0.75).flip(),
         Point(6.0, 7.375).flip(),
 
-        Point(FIELD_MIDLINE, 7.375) // this one's in the middle and doesn't need flipping
+        Point(FIELD_MIDLINE, 7.375), // these are in the middle and don't need flipping
+        Point(FIELD_MIDLINE, 5.0)
     )
 
     val stagingMarkers = listOf(
@@ -65,7 +66,6 @@ object ChargedUp2023 {
         recordPoints("Field/Blue Community", blueCommunity.getPoints())
         recordPoints("Field/Red Community", redCommunity.getPoints())
         recordPoints("Field/StagingMarkers", stagingMarkers)
-        recordPoints("Planner/Waypoints", navigationWaypoints)
 
         val nodePoses = mutableListOf<Point>()
         val allGrids = mutableListOf<Grid>()

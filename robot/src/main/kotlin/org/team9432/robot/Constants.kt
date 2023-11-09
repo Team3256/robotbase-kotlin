@@ -30,6 +30,8 @@ object DrivetrainConstants {
     const val BR_MODULE_OFFSET = 0
     const val ROBOT_WIDTH = 27 + 6 // Robot width with bumpers, in inches
 
+    const val OBSTACLE_TOLERANCE = (ROBOT_WIDTH / 2) + 5.0
+
     const val MAX_ANGULAR_SPEED_DEGREES_PER_SECOND = 360.0
     val MAX_ANGULAR_SPEED_DEGREES_PER_SECOND_SQUARED = MAX_ANGULAR_SPEED_DEGREES_PER_SECOND.pow(2)
 

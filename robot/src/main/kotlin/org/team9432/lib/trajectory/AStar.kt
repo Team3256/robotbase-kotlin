@@ -1,12 +1,14 @@
 package org.team9432.lib.trajectory
 
 import edu.wpi.first.math.geometry.Pose2d
+import edu.wpi.first.math.util.Units
 import org.littletonrobotics.junction.Logger
 import org.team9432.lib.field.*
+import org.team9432.lib.util.LoggerUtil
+import org.team9432.robot.DrivetrainConstants.OBSTACLE_TOLERANCE
 import java.time.Instant
 import kotlin.math.abs
 import kotlin.math.sqrt
-import org.team9432.lib.field.ChargedUp2023.navigationWaypoints as waypoints
 
 /**
  * A* implementation from https://rosettacode.org/wiki/A*_search_algorithm#Kotlin
@@ -15,7 +17,19 @@ import org.team9432.lib.field.ChargedUp2023.navigationWaypoints as waypoints
  * Higher values will take longer, but the path will be defined in more/smaller steps and is therefore more precise
  * Default value is 4
  */
-class AStar(private vararg val obstacles: Region) {
+class AStar(vararg obstacles: Region) {
+    private val obstacles = obstacles.map { it.expand(Units.inchesToMeters(OBSTACLE_TOLERANCE)) }
+    private val waypoints: Set<Point>
+
+    init {
+        val obstaclePoints = mutableListOf<Point>()
+        this.obstacles.forEach { obstaclePoints.addAll(it.getPoints()) }
+        LoggerUtil.recordPoints("Planner/Obstacles", obstaclePoints)
+
+        waypoints = ChargedUp2023.navigationWaypoints.filterNot { it.isInObstacle() }.toSet()
+        LoggerUtil.recordPoints("Planner/Waypoints", waypoints)
+    }
+
     /** This function takes Pose2d positions and converts them into a grid system that is usable by A* */
     fun findPath(initialPose: Pose2d, finalPose: Pose2d, printTime: Boolean = false): List<Pose2d>? {
         val start = if (printTime) Instant.now() else null
@@ -118,6 +132,8 @@ class AStar(private vararg val obstacles: Region) {
 
     // Any waypoint can be moved to so long as there isn't an obstacle in the way
     private fun getNeighbors(coordinate: Point) = waypoints.filterNot { obstacles.any { o -> o.intersects(Line(it, coordinate)) } }
+
+    private fun Point.isInObstacle() = obstacles.any { it.contains(this) }
 
     /** Gets the distance between two points */
     private fun heuristicDistance(start: Point, finish: Point): Double {

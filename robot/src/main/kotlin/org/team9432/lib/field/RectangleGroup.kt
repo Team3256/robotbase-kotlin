@@ -9,4 +9,5 @@ class RectangleGroup(private vararg val rectangles: Rectangle): Region {
     }
 
     override fun intersects(line: Line) = rectangles.any { it.intersectsLine(line) }
+    override fun expand(distance: Double) = RectangleGroup(*rectangles.map { it.expand(distance) }.toTypedArray())
 }
