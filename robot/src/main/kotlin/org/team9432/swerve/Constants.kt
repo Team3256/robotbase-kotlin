@@ -3,8 +3,10 @@ package org.team9432.swerve
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.math.util.Units
+import org.team9432.swerve.subsystems.drivetrain.ModuleIO
 import kotlin.math.pow
 
+@Suppress("unused")
 object DrivetrainConstants {
     const val MK4I_L2_DRIVE_REDUCTION = 6.75
     const val MK4I_L2_STEER_REDUCTION = 21.428571428571427
@@ -24,10 +26,8 @@ object DrivetrainConstants {
 
     const val SWERVE_MODULE_DISTANCE_FROM_CENTER = 15.25357313346778
 
-    const val FL_MODULE_OFFSET = 0
-    const val FR_MODULE_OFFSET = 0
-    const val BL_MODULE_OFFSET = 0
-    const val BR_MODULE_OFFSET = 0
+    val MODULE_OFFSETS = mapOf(ModuleIO.Module.FL to 0.0, ModuleIO.Module.FR to 0.0, ModuleIO.Module.BL to 0.0, ModuleIO.Module.BR to 0.0)
+
     const val ROBOT_WIDTH = 27 + 6 // Robot width with bumpers, in inches
 
     const val MAX_ANGULAR_SPEED_DEGREES_PER_SECOND = 360.0

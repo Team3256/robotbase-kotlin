@@ -13,7 +13,7 @@ import org.team9432.swerve.DrivetrainConstants.DRIVE_WHEEL_CIRCUMFERENCE
 import org.team9432.swerve.DrivetrainConstants.MK4I_L2_DRIVE_REDUCTION
 import org.team9432.swerve.DrivetrainConstants.MK4I_L2_STEER_REDUCTION
 
-class ModuleIOSim(override val position: ModuleIO.Position): ModuleIO {
+class ModuleIOSim(override val module: ModuleIO.Module): ModuleIO {
     private val driveSim = FlywheelSim(DCMotor.getNEO(1), MK4I_L2_DRIVE_REDUCTION, 0.025)
     private val steerSim = FlywheelSim(DCMotor.getNEO(1), MK4I_L2_STEER_REDUCTION, 0.004096955)
     private val drivePID = PIDController(20.0, 0.0, 0.003)
