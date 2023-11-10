@@ -11,7 +11,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader
 import org.littletonrobotics.junction.wpilog.WPILOGWriter
 import org.team9432.lib.commandbased.KCommandScheduler
 import org.team9432.lib.drivers.limelight.Limelight
-import org.team9432.swerve.Controls
+import org.team9432.robot.Controls
 
 
 /**

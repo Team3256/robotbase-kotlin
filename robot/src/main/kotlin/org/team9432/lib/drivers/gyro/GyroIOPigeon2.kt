@@ -3,7 +3,7 @@ package org.team9432.lib.drivers.gyro
 import com.ctre.phoenix6.hardware.Pigeon2
 import org.team9432.lib.drivers.gyro.GyroIO.GyroIOInputs
 import org.team9432.lib.util.RotationUtil.toSignedDegrees
-import org.team9432.swerve.Ports
+import org.team9432.robot.Ports
 
 class GyroIOPigeon2: GyroIO {
     private val pigeon = Pigeon2(Ports.PIGEON)

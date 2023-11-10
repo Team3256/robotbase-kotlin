@@ -1,9 +1,9 @@
-package org.team9432.swerve
+package org.team9432.robot
 
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.math.util.Units
-import org.team9432.swerve.subsystems.drivetrain.ModuleIO
+import org.team9432.robot.subsystems.drivetrain.ModuleIO
 import kotlin.math.pow
 
 @Suppress("unused")

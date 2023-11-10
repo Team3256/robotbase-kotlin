@@ -1,4 +1,4 @@
-package org.team9432.swerve.subsystems.drivetrain
+package org.team9432.robot.subsystems.drivetrain
 
 import edu.wpi.first.math.VecBuilder
 import edu.wpi.first.math.controller.PIDController
@@ -22,11 +22,11 @@ import org.team9432.lib.drivers.gyro.GyroIOPigeon2
 import org.team9432.lib.drivers.gyro.GyroIOSim
 import org.team9432.lib.drivers.gyro.LoggedGyroIOInputs
 import org.team9432.lib.wpilib.ChassisSpeeds
-import org.team9432.swerve.DrivetrainConstants
-import org.team9432.swerve.DrivetrainConstants.AngleConstants
-import org.team9432.swerve.DrivetrainConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED
-import org.team9432.swerve.DrivetrainConstants.MODULE_TRANSLATIONS
-import org.team9432.swerve.DrivetrainConstants.PoseConstants
+import org.team9432.robot.DrivetrainConstants
+import org.team9432.robot.DrivetrainConstants.AngleConstants
+import org.team9432.robot.DrivetrainConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED
+import org.team9432.robot.DrivetrainConstants.MODULE_TRANSLATIONS
+import org.team9432.robot.DrivetrainConstants.PoseConstants
 
 object Drivetrain: KSubsystem() {
     private val moduleInputs = List(4) { LoggedModuleIOInputs() }

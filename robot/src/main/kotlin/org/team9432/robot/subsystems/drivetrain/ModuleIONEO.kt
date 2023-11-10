@@ -1,4 +1,4 @@
-package org.team9432.swerve.subsystems.drivetrain
+package org.team9432.robot.subsystems.drivetrain
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration
 import com.ctre.phoenix6.hardware.CANcoder
@@ -10,12 +10,12 @@ import edu.wpi.first.math.util.Units
 import org.team9432.lib.drivers.motors.KSparkMAX
 import org.team9432.lib.util.MotorConversions
 import org.team9432.lib.util.SwerveUtil
-import org.team9432.swerve.DrivetrainConstants
-import org.team9432.swerve.DrivetrainConstants.DRIVE_WHEEL_CIRCUMFERENCE
-import org.team9432.swerve.DrivetrainConstants.DRIVE_WHEEL_DIAMETER
-import org.team9432.swerve.DrivetrainConstants.MK4I_L2_DRIVE_REDUCTION
-import org.team9432.swerve.DrivetrainConstants.MK4I_L2_STEER_REDUCTION
-import org.team9432.swerve.subsystems.drivetrain.ModuleIO.ModuleIOInputs
+import org.team9432.robot.DrivetrainConstants
+import org.team9432.robot.DrivetrainConstants.DRIVE_WHEEL_CIRCUMFERENCE
+import org.team9432.robot.DrivetrainConstants.DRIVE_WHEEL_DIAMETER
+import org.team9432.robot.DrivetrainConstants.MK4I_L2_DRIVE_REDUCTION
+import org.team9432.robot.DrivetrainConstants.MK4I_L2_STEER_REDUCTION
+import org.team9432.robot.subsystems.drivetrain.ModuleIO.ModuleIOInputs
 
 class ModuleIONEO(override val module: ModuleIO.Module): ModuleIO {
     private val drive = KSparkMAX(module.driveID)
