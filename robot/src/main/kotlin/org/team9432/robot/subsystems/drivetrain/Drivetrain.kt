@@ -16,6 +16,7 @@ import org.littletonrobotics.junction.Logger
 import org.team9432.Robot
 import org.team9432.Robot.Mode.*
 import org.team9432.lib.commandbased.KSubsystem
+import org.team9432.lib.commandbased.commands.SequentialCommand
 import org.team9432.lib.commandbased.commands.SimpleCommand
 import org.team9432.lib.drivers.gyro.GyroIO
 import org.team9432.lib.drivers.gyro.GyroIOSim
@@ -26,6 +27,7 @@ import org.team9432.robot.DrivetrainConstants.AngleConstants
 import org.team9432.robot.DrivetrainConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED
 import org.team9432.robot.DrivetrainConstants.MODULE_TRANSLATIONS
 import org.team9432.robot.DrivetrainConstants.PoseConstants
+import kotlin.math.abs
 
 object Drivetrain: KSubsystem() {
     private val moduleInputs = List(4) { LoggedModuleIOInputs() }
@@ -109,10 +111,16 @@ object Drivetrain: KSubsystem() {
         modules.forEach { it.disabled = true }
     }
 
-    private fun setPositionGoal(pose2d: Pose2d) {
-        xController.setpoint = pose2d.x
-        yController.setpoint = pose2d.y
-        angleController.setGoal(pose2d.rotation.degrees)
+    private fun setPositionGoal(position: Pose2d) {
+        Logger.recordOutput("Drive/PositionGoal", position)
+        xController.setpoint = position.x
+        yController.setpoint = position.y
+        angleController.setGoal(position.rotation.degrees)
+    }
+
+    private fun atPositionGoal(): Boolean {
+        val pose = getPose()
+        return abs(xController.setpoint - pose.x) < PoseConstants.EPSILON && abs(yController.setpoint - pose.y) < PoseConstants.EPSILON && abs(angleController.setpoint.position - pose.rotation.degrees) < AngleConstants.EPSILON
     }
 
     private fun setSpeeds(speeds: ChassisSpeeds) {
@@ -139,6 +147,17 @@ object Drivetrain: KSubsystem() {
             angleController.reset(angle)
         }
 
+    fun driveToPositionCommand(
+        position: Pose2d,
+    ) = SimpleCommand(
+        initialize = {
+            setPositionGoal(position)
+            mode = SubsystemMode.PID
+        },
+        requirements = mutableSetOf(Drivetrain),
+        isFinished = { mode != SubsystemMode.PID || atPositionGoal() }
+    )
+
     fun fieldOrientedDriveCommand(
         xJoystickInput: () -> Double,
         yJoystickInput: () -> Double,
@@ -146,6 +165,7 @@ object Drivetrain: KSubsystem() {
         maxSpeedMetersPerSecond: Double = DrivetrainConstants.MAX_VELOCITY_METERS_PER_SECOND,
         maxSpeedDegreesPerSecond: Double = DrivetrainConstants.MAX_ANGULAR_SPEED_DEGREES_PER_SECOND,
     ) = SimpleCommand(
+        initialize = { mode = SubsystemMode.MANUAL },
         execute = {
             val xSpeed = xJoystickInput.invoke() * maxSpeedMetersPerSecond
             val ySpeed = yJoystickInput.invoke() * maxSpeedMetersPerSecond
@@ -153,6 +173,7 @@ object Drivetrain: KSubsystem() {
             manualSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, radiansPerSecond, yaw)
         },
         end = { manualSpeeds = ChassisSpeeds(0.0, 0.0, 0.0) },
-        requirements = mutableSetOf(Drivetrain)
+        requirements = mutableSetOf(Drivetrain),
+        isFinished = { mode != SubsystemMode.MANUAL }
     )
 }
