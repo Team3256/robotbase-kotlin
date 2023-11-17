@@ -27,6 +27,7 @@ import org.team9432.robot.DrivetrainConstants.AngleConstants
 import org.team9432.robot.DrivetrainConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED
 import org.team9432.robot.DrivetrainConstants.MODULE_TRANSLATIONS
 import org.team9432.robot.DrivetrainConstants.PoseConstants
+import kotlin.math.abs
 
 object Drivetrain: KSubsystem() {
     private val moduleInputs = List(4) { LoggedModuleIOInputs() }
@@ -96,7 +97,15 @@ object Drivetrain: KSubsystem() {
         }
     }
 
-    override fun manualPeriodic() = setSpeeds(manualSpeeds)
+    override fun manualPeriodic() {
+        if (isNotMoving()) {
+            x()
+        } else {
+            setSpeeds(manualSpeeds)
+        }
+    }
+
+    private fun isNotMoving() = abs(manualSpeeds.vxMetersPerSecond) < 0.5 && abs(manualSpeeds.vyMetersPerSecond) < 0.5 && abs(Math.toDegrees(manualSpeeds.omegaRadiansPerSecond)) < 5
 
     override fun PIDPeriodic() {
         val currentPose = getPose()
@@ -132,6 +141,15 @@ object Drivetrain: KSubsystem() {
 
     private fun setSwerveModules(states: List<SwerveModuleState>) {
         for (i in modules.indices) modules[i].setState(states[i])
+    }
+
+    private fun x() {
+        setSwerveModules(listOf(
+            SwerveModuleState(0.0, Rotation2d.fromDegrees(-45.0)),
+            SwerveModuleState(0.0, Rotation2d.fromDegrees(45.0)),
+            SwerveModuleState(0.0, Rotation2d.fromDegrees(45.0)),
+            SwerveModuleState(0.0, Rotation2d.fromDegrees(-45.0)),
+        ))
     }
 
     private fun getPose(): Pose2d = poseEstimator.estimatedPosition
