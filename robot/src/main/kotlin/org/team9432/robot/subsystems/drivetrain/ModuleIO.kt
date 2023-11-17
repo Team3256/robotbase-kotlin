@@ -9,6 +9,8 @@ interface ModuleIO {
         var positionMeters = 0.0
         var speedMetersPerSecond = 0.0
         var angle = 0.0
+        var targetAngle = 0.0
+        var targetSpeed = 0.0
     }
 
     fun updateInputs(inputs: ModuleIOInputs)

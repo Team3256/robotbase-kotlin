@@ -9,9 +9,9 @@ import kotlin.math.withSign
 
 class KXboxController(
     port: Int,
-    val joystickDeadband: Double = 0.15,
-    val squareJoysticks: Boolean = true,
-    val triggerButtonDistance: Double = 0.2,
+    private val joystickDeadband: Double = 0.2,
+    private val squareJoysticks: Boolean = true,
+    private val triggerButtonDistance: Double = 0.2,
 ): GenericHID(port) {
     enum class Button(val value: Int) {
         LEFT_BUMPER(5), RIGHT_BUMPER(6), LEFT_STICK(9), RIGHT_STICK(10), A(1), B(2), X(3), Y(4), BACK(7), START(8),

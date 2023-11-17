@@ -72,7 +72,6 @@ object Drivetrain: KSubsystem() {
                 Units.inchesToMeters(0.0), Units.inchesToMeters(0.0), Math.toDegrees(0.0)
             )
         )
-
         for (m in modules) m.setBrakeMode(true)
     }
 
@@ -156,6 +155,8 @@ object Drivetrain: KSubsystem() {
             manualSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, radiansPerSecond, yaw)
         },
         end = { manualSpeeds = ChassisSpeeds(0.0, 0.0, 0.0) },
-        requirements = mutableSetOf(Drivetrain)
+        isFinished = { false },
+        requirements = mutableSetOf(Drivetrain),
+        initialize = { mode = SubsystemMode.MANUAL }
     )
 }

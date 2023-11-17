@@ -26,7 +26,12 @@ object DrivetrainConstants {
 
     const val SWERVE_MODULE_DISTANCE_FROM_CENTER = 15.25357313346778
 
-    val MODULE_OFFSETS = mapOf(ModuleIO.Module.FL to 0.0, ModuleIO.Module.FR to 0.0, ModuleIO.Module.BL to 0.0, ModuleIO.Module.BR to 0.0)
+    val MODULE_OFFSETS = mapOf(
+        ModuleIO.Module.FL to 190.72265625,
+        ModuleIO.Module.FR to 288.9843658447266,
+        ModuleIO.Module.BL to 71.45507469177247,
+        ModuleIO.Module.BR to 306.73826751708987
+    )
 
     const val ROBOT_WIDTH = 27 + 6 // Robot width with bumpers, in inches
 
