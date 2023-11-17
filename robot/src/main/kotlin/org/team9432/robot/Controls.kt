@@ -13,7 +13,7 @@ object Controls {
     init {
         Drivetrain.defaultCommand = Drivetrain.fieldOrientedDriveCommand({ controller.leftY }, { controller.leftX }, { -controller.rightX })
 
-        controller.a.onTrue(InstantCommand { Limelight.setLEDMode(LimelightIONetworkTables.LEDMode.FORCE_ON) })
-        controller.b.onTrue(InstantCommand { Limelight.setLEDMode(LimelightIONetworkTables.LEDMode.FORCE_OFF) })
+        controller.a.onTrue(InstantCommand { Drivetrain.resetGyro() })
+//        controller.b.onTrue(InstantCommand { Limelight.setLEDMode(LimelightIONetworkTables.LEDMode.FORCE_OFF) })
     }
 }

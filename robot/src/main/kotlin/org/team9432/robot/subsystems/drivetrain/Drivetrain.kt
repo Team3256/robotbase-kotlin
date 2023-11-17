@@ -128,6 +128,8 @@ object Drivetrain: KSubsystem() {
 
     private fun getModuleStates() = moduleInputs.map { SwerveModuleState(it.speedMetersPerSecond, Rotation2d.fromDegrees(it.angle)) }
 
+    fun resetGyro() = gyro.setYaw(0.0)
+
     private fun setSwerveModules(states: List<SwerveModuleState>) {
         for (i in modules.indices) modules[i].setState(states[i])
     }
