@@ -5,3 +5,5 @@ build/
 
 /robot/src/main/kotlin/org/team9432/BuildConstants.java
 /robot/networktables.json
+/robot/bin/
+/annotation/bin/

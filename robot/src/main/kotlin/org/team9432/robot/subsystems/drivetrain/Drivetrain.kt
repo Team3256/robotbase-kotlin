@@ -1,4 +1,4 @@
-package org.team9432.swerve.subsystems.drivetrain
+package org.team9432.robot.subsystems.drivetrain
 
 import edu.wpi.first.math.VecBuilder
 import edu.wpi.first.math.controller.PIDController
@@ -18,24 +18,28 @@ import org.team9432.Robot.Mode.*
 import org.team9432.lib.commandbased.KSubsystem
 import org.team9432.lib.commandbased.commands.SimpleCommand
 import org.team9432.lib.drivers.gyro.GyroIO
+import org.team9432.lib.drivers.gyro.GyroIOPigeon2
 import org.team9432.lib.drivers.gyro.GyroIOSim
 import org.team9432.lib.drivers.gyro.LoggedGyroIOInputs
 import org.team9432.lib.wpilib.ChassisSpeeds
-import org.team9432.swerve.DrivetrainConstants
-import org.team9432.swerve.DrivetrainConstants.AngleConstants
-import org.team9432.swerve.DrivetrainConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED
-import org.team9432.swerve.DrivetrainConstants.MODULE_TRANSLATIONS
-import org.team9432.swerve.DrivetrainConstants.PoseConstants
+import org.team9432.robot.DrivetrainConstants
+import org.team9432.robot.DrivetrainConstants.AngleConstants
+import org.team9432.robot.DrivetrainConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED
+import org.team9432.robot.DrivetrainConstants.MODULE_TRANSLATIONS
+import org.team9432.robot.DrivetrainConstants.PoseConstants
+import kotlin.math.abs
 
 object Drivetrain: KSubsystem() {
     private val moduleInputs = List(4) { LoggedModuleIOInputs() }
     private val modules: List<ModuleIO> = when (Robot.mode) {
-        REAL, REPLAY, SIM -> ModuleIO.Position.entries.map { ModuleIOSim(it) }
+        REAL, REPLAY -> ModuleIO.Module.entries.map { ModuleIONEO(it) }
+        SIM -> ModuleIO.Module.entries.map { ModuleIOSim(it) }
     }
 
     private val gyroInputs = LoggedGyroIOInputs()
     private val gyro: GyroIO = when (Robot.mode) {
-        REAL, REPLAY, SIM -> GyroIOSim()
+        REAL, REPLAY -> GyroIOPigeon2()
+        SIM -> GyroIOSim()
     }
 
     private val angleController = ProfiledPIDController(AngleConstants.P, AngleConstants.I, AngleConstants.D, AngleConstants.CONTROLLER_CONSTRAINTS)
@@ -69,14 +73,13 @@ object Drivetrain: KSubsystem() {
                 Units.inchesToMeters(0.0), Units.inchesToMeters(0.0), Math.toDegrees(0.0)
             )
         )
-
         for (m in modules) m.setBrakeMode(true)
     }
 
     override fun constantPeriodic() {
         for (i in modules.indices) {
             modules[i].updateInputs(moduleInputs[i])
-            Logger.processInputs(("Drive/" + modules[i].position.name) + "_Module", moduleInputs[i])
+            Logger.processInputs(("Drive/" + modules[i].module.name) + "_Module", moduleInputs[i])
 
             if (RobotState.isDisabled()) modules[i].updateIntegratedEncoder()
         }
@@ -94,7 +97,15 @@ object Drivetrain: KSubsystem() {
         }
     }
 
-    override fun manualPeriodic() = setSpeeds(manualSpeeds)
+    override fun manualPeriodic() {
+        if (isNotMoving()) {
+            x()
+        } else {
+            setSpeeds(manualSpeeds)
+        }
+    }
+
+    private fun isNotMoving() = abs(manualSpeeds.vxMetersPerSecond) < 0.5 && abs(manualSpeeds.vyMetersPerSecond) < 0.5 && abs(Math.toDegrees(manualSpeeds.omegaRadiansPerSecond)) < 5
 
     override fun PIDPeriodic() {
         val currentPose = getPose()
@@ -126,8 +137,19 @@ object Drivetrain: KSubsystem() {
 
     private fun getModuleStates() = moduleInputs.map { SwerveModuleState(it.speedMetersPerSecond, Rotation2d.fromDegrees(it.angle)) }
 
+    fun resetGyro() = gyro.setYaw(0.0)
+
     private fun setSwerveModules(states: List<SwerveModuleState>) {
         for (i in modules.indices) modules[i].setState(states[i])
+    }
+
+    private fun x() {
+        setSwerveModules(listOf(
+            SwerveModuleState(0.0, Rotation2d.fromDegrees(-45.0)),
+            SwerveModuleState(0.0, Rotation2d.fromDegrees(45.0)),
+            SwerveModuleState(0.0, Rotation2d.fromDegrees(45.0)),
+            SwerveModuleState(0.0, Rotation2d.fromDegrees(-45.0)),
+        ))
     }
 
     private fun getPose(): Pose2d = poseEstimator.estimatedPosition
@@ -153,6 +175,8 @@ object Drivetrain: KSubsystem() {
             manualSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, radiansPerSecond, yaw)
         },
         end = { manualSpeeds = ChassisSpeeds(0.0, 0.0, 0.0) },
-        requirements = mutableSetOf(Drivetrain)
+        isFinished = { false },
+        requirements = mutableSetOf(Drivetrain),
+        initialize = { mode = SubsystemMode.MANUAL }
     )
 }

@@ -11,7 +11,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader
 import org.littletonrobotics.junction.wpilog.WPILOGWriter
 import org.team9432.lib.commandbased.KCommandScheduler
 import org.team9432.lib.drivers.limelight.Limelight
-import org.team9432.swerve.Controls
+import org.team9432.robot.Controls
 
 
 /**
@@ -25,7 +25,7 @@ import org.team9432.swerve.Controls
  * object or package, it will get changed everywhere.)
  */
 object Robot: LoggedRobot() {
-    val mode = Mode.SIM
+    val mode = Mode.REAL
 
     override fun robotInit() {
         Logger.recordMetadata("ProjectName", "Swerve") // Set a metadata value
@@ -37,8 +37,8 @@ object Robot: LoggedRobot() {
         } else if (mode == Mode.REPLAY) {
             setUseTiming(false) // Run as fast as possible
             val logPath = LogFileUtil.findReplayLog() // Pull the replay log from AdvantageScope (or prompt the user)
-            Logger.setReplaySource(WPILOGReader(logPath)) // Read replay log
-            Logger.addDataReceiver(WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")))
+//            Logger.setReplaySource(WPILOGReader(logPath)) // Read replay log
+//            Logger.addDataReceiver(WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")))
         }
 
         Logger.start() // Start logging! No more data receivers, replay sources, or metadata values may be added.
@@ -48,7 +48,7 @@ object Robot: LoggedRobot() {
         }
 
         Controls
-        Limelight
+//        Limelight
     }
 
     override fun robotPeriodic() {
