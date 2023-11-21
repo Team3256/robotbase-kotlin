@@ -3,14 +3,10 @@ package org.team9432.lib.commandbased.input
 import edu.wpi.first.hal.FRCNetComm.tResourceType
 import edu.wpi.first.hal.HAL
 import edu.wpi.first.wpilibj.GenericHID
-import kotlin.math.abs
-import kotlin.math.pow
-import kotlin.math.withSign
 
 class KXboxController(
     port: Int,
-    private val joystickDeadband: Double = 0.2,
-    private val squareJoysticks: Boolean = true,
+    private val joystickProcessor: (Double) -> Double = { it },
     private val triggerButtonDistance: Double = 0.2,
 ): GenericHID(port) {
     enum class Button(val value: Int) {
@@ -25,10 +21,10 @@ class KXboxController(
         HAL.report(tResourceType.kResourceType_XboxController, port + 1)
     }
 
-    val leftX get() = getRawAxis(Axis.LEFT_X.value).applyDeadband().applySquare()
-    val leftY get() = getRawAxis(Axis.LEFT_Y.value).applyDeadband().applySquare()
-    val rightX get() = getRawAxis(Axis.RIGHT_X.value).applyDeadband().applySquare()
-    val rightY get() = getRawAxis(Axis.RIGHT_Y.value).applyDeadband().applySquare()
+    val leftX get() = joystickProcessor(getRawAxis(Axis.LEFT_X.value))
+    val leftY get() = joystickProcessor(getRawAxis(Axis.LEFT_Y.value))
+    val rightX get() = joystickProcessor(getRawAxis(Axis.RIGHT_X.value))
+    val rightY get() = joystickProcessor(getRawAxis(Axis.RIGHT_Y.value))
     val leftTriggerAxis get() = getRawAxis(Axis.LEFT_TRIGGER.value)
     val rightTriggerAxis get() = getRawAxis(Axis.RIGHT_TRIGGER.value)
 
@@ -51,8 +47,4 @@ class KXboxController(
     val y get() = KTrigger { getRawButton(Button.Y.value) }
     val back get() = KTrigger { getRawButton(Button.BACK.value) }
     val start get() = KTrigger { getRawButton(Button.START.value) }
-
-
-    private fun Double.applyDeadband() = if (abs(this) > joystickDeadband) this else 0.0
-    private fun Double.applySquare() = if (squareJoysticks) this.pow(2).withSign(this) else this
 }
